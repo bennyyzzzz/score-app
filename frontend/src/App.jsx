@@ -6,14 +6,19 @@ function App() {
   const [result, setResult] = useState(null);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: Number(e.target.value) });
+  setForm({
+      ...form,
+      [e.target.name]: e.target.value === "" ? 0 : Number(e.target.value)
+    });
   };
 
   const handleSubmit = async () => {
+    console.log("clicou");
     try {
       const res = await axios.post("http://localhost:3001/calculate-score", form);
       setResult(res.data);
     } catch (err) {
+      console.log("ERRO:", err.response?.data || err.message);
       alert("Erro ao calcular score");
     }
   };
@@ -24,12 +29,12 @@ function App() {
         <h1 style={styles.title}>Score de Potencial</h1>
 
         <div style={styles.inputs}>
-          <input name="revenueLastMonth" placeholder="Faturamento mês" onChange={handleChange} />
-          <input name="traffic" placeholder="Tráfego" onChange={handleChange} />
-          <input name="returningUsers" placeholder="% Recorrentes" onChange={handleChange} />
-          <input name="organic" placeholder="% Orgânico" onChange={handleChange} />
-          <input name="mobile" placeholder="% Mobile" onChange={handleChange} />
-          <input name="conversion" placeholder="Conversão %" onChange={handleChange} />
+          <input required name="revenueLastMonth" placeholder="Faturamento mês" onChange={handleChange} />
+          <input required name="traffic" placeholder="Tráfego" onChange={handleChange} />
+          <input required name="returningUsers" placeholder="% Recorrentes" onChange={handleChange} />
+          <input required name="organic" placeholder="% Orgânico" onChange={handleChange} />
+          <input required name="mobile" placeholder="% Mobile" onChange={handleChange} />
+          <input required name="conversion" placeholder="Conversão %" onChange={handleChange} />
         </div>
 
         <button style={styles.button} onClick={handleSubmit}>
@@ -90,9 +95,10 @@ const styles = {
   },
 
   result: {
-    marginTop: 20,
-    textAlign: "center",
-    color: "#fff",
+  marginTop: 20,
+  textAlign: "center",
+  color: "#fff",
+  width: "100%",
   },
 
   score: {

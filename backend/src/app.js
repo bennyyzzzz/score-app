@@ -4,7 +4,11 @@ const scoreRoutes = require("./routes/scoreRoutes");
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type"]
+}));
 app.use(express.json());
 
 app.use("/calculate-score", scoreRoutes);
