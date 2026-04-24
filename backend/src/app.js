@@ -1,0 +1,13 @@
+const express = require("express");
+const cors = require("cors");
+const scoreRoutes = require("./routes/scoreRoutes");
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+app.use("/calculate-score", scoreRoutes);
+
+const PORT = 3001;
+app.listen(PORT, () => console.log(`Server running on ${PORT}`));
