@@ -37,41 +37,61 @@ function App() {
     <div style={styles.page}>
       <div style={styles.card}>
         <h1 style={styles.title}>Score de Potencial</h1>
+          <div style={styles.section}>
+            <h3 style={styles.sectionTitle}>Receita</h3>
 
-        <div style={styles.inputs}>
-          <input type="number" name="revenueLast30Days" placeholder="Receita últimos 30 dias" onChange={handleChange} />
+            <label style={styles.label}>Receita últimos 30 dias (R$)</label>
+            <input type="number" name="revenueLast30Days" placeholder="Ex: 50000" onChange={handleChange} />
+          </div>
 
-          <input type="number" name="totalUsersLast60Days" placeholder="Usuários últimos 60 dias" onChange={handleChange} />
+          <div style={styles.section}>
+            <h3 style={styles.sectionTitle}>Usuários</h3>
 
-          <input type="number" name="returningUsers" placeholder="Usuários recorrentes" onChange={handleChange} />
+            <label style={styles.label}>Usuários totais últimos 60 dias</label>
+            <input type="number" name="totalUsersLast60Days" placeholder="Ex: 20000" onChange={handleChange} />
 
-          <input type="number" name="organicUsers" placeholder="Usuários via orgânico" onChange={handleChange} />
+            <label style={styles.label}>Usuários recorrentes</label>
+            <input type="number" name="returningUsers" placeholder="Ex: 6000" onChange={handleChange} />
 
-          <input type="number" name="campaignUsers" placeholder="Usuários via campanhas" onChange={handleChange} />
+            <label style={styles.label}>Usuários mobile</label>
+            <input type="number" name="mobileUsers" placeholder="Ex: 15000" onChange={handleChange} />
+          </div>
 
-          <input type="number" name="otherUsers" placeholder="Usuários via outros meios" onChange={handleChange} />
+          <div style={styles.section}>
+            <h3 style={styles.sectionTitle}>Origem dos usuários</h3>
 
-          <select
-            name="segment"
-            onChange={handleChange}
-            defaultValue=""
-            style={styles.select}
-          >
+            <label style={styles.label}>Usuários via orgânico</label>
+            <input type="number" name="organicUsers" placeholder="Ex: 7000" onChange={handleChange} />
 
-            <option value="" disabled>Segmento</option>
-            <option value="moda">Moda</option>
-            <option value="eletronicos">Eletrônicos</option>
-            <option value="beleza">Beleza</option>
-            <option value="alimentos">Alimentos</option>
-            <option value="b2b">B2B</option>
-            <option value="servicos">Serviços</option>
-            <option value="outros">Outros</option>
-          </select>
+            <label style={styles.label}>Usuários via campanhas</label>
+            <input type="number" name="campaignUsers" placeholder="Ex: 8000" onChange={handleChange} />
 
-          <input type="number" name="mobileUsers" placeholder="Usuários mobile" onChange={handleChange} />
+            <label style={styles.label}>Usuários via outros meios</label>
+            <input type="number" name="otherUsers" placeholder="Ex: 5000" onChange={handleChange} />
+          </div>
 
-          <input type="number" step="0.1" name="conversionRate" placeholder="Percentual de conversão" onChange={handleChange} />
-        </div>
+          <div style={styles.section}>
+            <h3 style={styles.sectionTitle}>Negócio</h3>
+
+            <label style={styles.label}>Segmento</label>
+            <select name="segment" onChange={handleChange} defaultValue="" style={styles.select}>
+              <option value="" disabled>Selecione o segmento</option>
+              <option value="moda">Moda</option>
+              <option value="eletronicos">Eletrônicos</option>
+              <option value="beleza">Beleza</option>
+              <option value="alimentos">Alimentos</option>
+              <option value="b2b">B2B</option>
+              <option value="servicos">Serviços</option>
+              <option value="outros">Outros</option>
+            </select>
+          </div>
+
+          <div style={styles.section}>
+            <h3 style={styles.sectionTitle}>Conversão</h3>
+
+            <label style={styles.label}>Taxa de conversão do site (%)</label>
+            <input type="number" step="0.1" name="conversionRate" placeholder="Ex: 1.2" onChange={handleChange} />
+          </div>
 
         <button type="button" style={styles.button} onClick={handleSubmit}>
           Calcular Score
@@ -142,6 +162,28 @@ const styles = {
     flexDirection: "column",
     gap: 8,
     padding: 5,
+  },
+
+  section: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 6,
+    marginBottom: 14,
+  },
+
+  sectionTitle: {
+    color: "#fff",
+    fontSize: 14,
+    margin: "8px 0 4px",
+    textAlign: "left",
+    borderBottom: "1px solid rgba(255,255,255,0.08)",
+    paddingBottom: 4,
+  },
+
+  label: {
+    color: "#ccc",
+    fontSize: 12,
+    textAlign: "left",
   },
 
   button: {
