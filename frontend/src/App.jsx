@@ -24,6 +24,16 @@ function App() {
     }
   }
 
+  const total =
+    (form.organicUsers || 0) +
+    (form.campaignUsers || 0) +
+    (form.otherUsers || 0);
+
+  if (total > form.totalUsersLast60Days) {
+    alert("A soma das origens não pode ser maior que o total de usuários.");
+    return;
+  }
+
     try {
       const res = await axios.post("http://localhost:3001/calculate-score", form);
       setResult(res.data);
@@ -41,33 +51,33 @@ function App() {
             <h3 style={styles.sectionTitle}>Receita</h3>
 
             <label style={styles.label}>Receita últimos 30 dias (R$)</label>
-            <input type="number" name="revenueLast30Days" placeholder="Ex: 50000" onChange={handleChange} />
+            <input min="0" type="number" name="revenueLast30Days" placeholder="Ex: 50000" onChange={handleChange} />
           </div>
 
           <div style={styles.section}>
             <h3 style={styles.sectionTitle}>Usuários</h3>
 
             <label style={styles.label}>Usuários totais últimos 60 dias</label>
-            <input type="number" name="totalUsersLast60Days" placeholder="Ex: 20000" onChange={handleChange} />
+            <input min="0"  type="number" name="totalUsersLast60Days" placeholder="Ex: 20000" onChange={handleChange} />
 
             <label style={styles.label}>Usuários recorrentes</label>
-            <input type="number" name="returningUsers" placeholder="Ex: 6000" onChange={handleChange} />
+            <input min="0" type="number" name="returningUsers" placeholder="Ex: 6000" onChange={handleChange} />
 
             <label style={styles.label}>Usuários mobile</label>
-            <input type="number" name="mobileUsers" placeholder="Ex: 15000" onChange={handleChange} />
+            <input min="0" type="number" name="mobileUsers" placeholder="Ex: 15000" onChange={handleChange} />
           </div>
 
           <div style={styles.section}>
             <h3 style={styles.sectionTitle}>Origem dos usuários</h3>
 
             <label style={styles.label}>Usuários via orgânico</label>
-            <input type="number" name="organicUsers" placeholder="Ex: 7000" onChange={handleChange} />
+            <input min="0" type="number" name="organicUsers" placeholder="Ex: 7000" onChange={handleChange} />
 
             <label style={styles.label}>Usuários via campanhas</label>
-            <input type="number" name="campaignUsers" placeholder="Ex: 8000" onChange={handleChange} />
+            <input min="0" type="number" name="campaignUsers" placeholder="Ex: 8000" onChange={handleChange} />
 
             <label style={styles.label}>Usuários via outros meios</label>
-            <input type="number" name="otherUsers" placeholder="Ex: 5000" onChange={handleChange} />
+            <input min="0" type="number" name="otherUsers" placeholder="Ex: 5000" onChange={handleChange} />
           </div>
 
           <div style={styles.section}>
