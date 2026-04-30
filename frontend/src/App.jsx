@@ -5,6 +5,8 @@ import jsPDF from "jspdf";
 function App() {
   const [form, setForm] = useState({});
   const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [showFullAI, setShowFullAI] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -15,73 +17,117 @@ function App() {
     });
   };
 
-  const handleSubmit = async () => {
-    for (let field of requiredFields) {
-      if (form[field] === undefined || form[field] === "") {
-        alert("Preencha todos os campos antes de calcular.");
-        return;
-      }
-    }
-
-    const total =
-      (form.organicUsers || 0) +
-      (form.campaignUsers || 0) +
-      (form.otherUsers || 0);
-
-    if (total > form.totalUsersLast60Days) {
-      alert("A soma das origens não pode ser maior que o total de usuários.");
+const handleSubmit = async () => {
+  for (let field of requiredFields) {
+    if (form[field] === undefined || form[field] === "") {
+      alert("Preencha todos os campos antes de calcular.");
       return;
     }
+  }
 
-    try {
-      const res = await axios.post("http://localhost:3001/calculate-score", form);
-      setResult(res.data);
-    } catch (err) {
-      console.log("ERRO:", err.response?.data || err.message);
-      alert("Erro ao calcular score");
-    }
-  };
+      const total =
+        (form.organicUsers || 0) +
+        (form.campaignUsers || 0) +
+        (form.otherUsers || 0);
 
-  const generatePDF = () => {
-    if (!result) {
-      alert("Calcule o score antes de gerar o PDF.");
-      return;
-    }
+        if (total > form.totalUsersLast60Days) {
+          alert("A soma das origens não pode ser maior que o total de usuários.");
+          return;
+        }
+
+        try {
+          setLoading(true);
+          setResult(null);
+
+          const res = await axios.post("http://localhost:3001/calculate-score", form);
+
+          setResult(res.data);
+        } catch (err) {
+          console.log("ERRO:", err.response?.data || err.message);
+          alert("Erro ao calcular score");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+const generatePDF = () => {
+  if (!result) {
+    alert("Calcule o score antes de gerar o PDF.");
+    return;
+  }
 
     const doc = new jsPDF();
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
-    doc.text("Relatório de Potencial para App", 20, 20);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(18);
+      doc.text("Relatório de Potencial para App", 20, 20);
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(12);
-    doc.text(`Score: ${result.score}/100`, 20, 40);
-    doc.text(`Classificação: ${result.stars} estrelas`, 20, 50);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(12);
 
-    doc.setFont("helvetica", "bold");
-    doc.text("Insight", 20, 70);
+      doc.text(`Score: ${result.score}/100`, 20, 40);
+      doc.text(`Classificação: ${result.stars} estrelas`, 20, 50);
 
-    doc.setFont("helvetica", "normal");
-    const insightLines = doc.splitTextToSize(result.insight, 170);
-    doc.text(insightLines, 20, 80);
+      doc.setFont("helvetica", "bold");
+      doc.text("Insight", 20, 70);
 
-    let y = 100 + insightLines.length * 6;
+      doc.setFont("helvetica", "normal");
+      const insightLines = doc.splitTextToSize(result.insight, 170);
+      doc.text(insightLines, 20, 80);
 
-    doc.setFont("helvetica", "bold");
-    doc.text("Métricas calculadas", 20, y);
+      let y = 90 + insightLines.length * 6;
 
-    y += 10;
+      doc.setFont("helvetica", "bold");
+      doc.text("Métricas calculadas", 20, y);
 
-    doc.setFont("helvetica", "normal");
-    doc.text(`Recorrência: ${result.metrics.returningRate}%`, 20, y);
-    doc.text(`Orgânico: ${result.metrics.organicRate}%`, 20, y + 10);
-    doc.text(`Campanhas: ${result.metrics.campaignRate}%`, 20, y + 20);
-    doc.text(`Outros meios: ${result.metrics.otherRate}%`, 20, y + 30);
-    doc.text(`Mobile: ${result.metrics.mobileRate}%`, 20, y + 40);
+      y += 10;
 
-    doc.save("relatorio-score-potencial.pdf");
-  };
+      doc.setFont("helvetica", "normal");
+      doc.text(`Recorrência: ${result.metrics.returningRate}%`, 20, y);
+      doc.text(`Orgânico: ${result.metrics.organicRate}%`, 20, y + 10);
+      doc.text(`Campanhas: ${result.metrics.campaignRate}%`, 20, y + 20);
+      doc.text(`Outros meios: ${result.metrics.otherRate}%`, 20, y + 30);
+      doc.text(`Mobile: ${result.metrics.mobileRate}%`, 20, y + 40);
+
+      y += 60;
+
+      if (result.ai?.analysis) {
+        doc.setFont("helvetica", "bold");
+        doc.text("Análise personalizada por IA", 20, y);
+
+        y += 10;
+
+        doc.setFont("helvetica", "normal");
+        const aiLines = doc.splitTextToSize(result.ai.analysis, 170);
+
+        // quebra de página simples
+        aiLines.forEach((line) => {
+          if (y > 280) {
+            doc.addPage();
+            y = 20;
+          }
+
+          doc.text(line, 20, y);
+          y += 7;
+        });
+      } else if (result.ai?.error) {
+        doc.setFont("helvetica", "bold");
+        doc.text("Análise personalizada por IA", 20, y);
+
+        y += 10;
+
+        doc.setFont("helvetica", "normal");
+        doc.text(`Indisponível: ${result.ai.error}`, 20, y);
+      }
+
+      doc.save("relatorio-score-potencial.pdf");
+    };
+
+    const getPreviewText = (text, limit = 250) => {
+      if (!text) return "";
+      if (text.length <= limit) return text;
+    return text.substring(0, limit) + "...";
+    };
 
   return (
     <div className="app-page">
@@ -165,53 +211,71 @@ function App() {
             </div>
           </div>
 
-          <button type="button" className="primary-button" onClick={handleSubmit}>
-            Calcular Score
+          <button
+            type="button"
+            className="primary-button"
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? "Calculando..." : "Calcular Score"}
           </button>
         </div>
 
-        <div className="led-card result-card">
-          {!result ? (
-            <p className="empty-result">Preencha os dados para ver o resultado</p>
-          ) : (
-            <>
-              <h2 className="score">{result.score}</h2>
-              <div className="stars">{"⭐".repeat(result.stars)}</div>
-              <p className="insight">{result.insight}</p>
-              {result.ai?.analysis ? (
-                <div className="ai-analysis">
-                  <h3>Análise IA</h3>
-                  <p>{result.ai.analysis}</p>
-                </div>
-              ) : result.ai?.error ? (
-                <div className="ai-unavailable">
-                  <h3>Análise IA indisponível</h3>
-                  <p>A análise personalizada por IA não está disponível no momento.</p>
-                  <small>{result.ai.provider ? `Provider: ${result.ai.provider}` : ""}</small>
-                </div>
-              ) : null}              
-              {result.ai?.analysis && (
-                <div className="ai-analysis">
-                  <h3>Análise personalizada</h3>
-                  <p>{result.ai.analysis}</p>
-                </div>
-              )}
+          <div className="led-card result-card">
+            {loading ? (
+              <div className="loading-box">
+                <div className="loader"></div>
+                <p>Calculando score e gerando análise...</p>
+              </div>
+            ) : !result ? (
+              <p className="empty-result">Preencha os dados para ver o resultado</p>
+            ) : (
+              <>
+                <h2 className="score">{result.score}</h2>
+                <div className="stars">{"⭐".repeat(result.stars)}</div>
+                <p className="insight">{result.insight}</p>
 
-              {result.metrics && (
-                <div className="metrics">
-                  <p>Recorrência: {result.metrics.returningRate}%</p>
-                  <p>Orgânico: {result.metrics.organicRate}%</p>
-                  <p>Campanhas: {result.metrics.campaignRate}%</p>
-                  <p>Mobile: {result.metrics.mobileRate}%</p>
-                </div>
-              )}
-            </>
-          )}
+                {result.ai?.analysis ? (
+                  <div className="ai-analysis">
+                    <h3>Análise IA</h3>
 
-          <button type="button" className="pdf-button" onClick={generatePDF}>
-            Baixar PDF
-          </button>
-        </div>
+                    <p>
+                      {showFullAI
+                        ? result.ai.analysis
+                        : getPreviewText(result.ai.analysis)}
+                    </p>
+
+                    {result.ai.analysis.length > 250 && (
+                      <button
+                        className="toggle-ai"
+                        onClick={() => setShowFullAI(!showFullAI)}
+                      >
+                        {showFullAI ? "Mostrar menos" : "Mostrar mais"}
+                      </button>
+                    )}
+                  </div>
+                ) : result.ai?.error ? (
+                  <div className="ai-unavailable">
+                    <h3>Análise IA indisponível</h3>
+                    <p>{result.ai.error}</p>
+                  </div>
+                ) : null}
+
+                {result.metrics && (
+                  <div className="metrics">
+                    <p>Recorrência: {result.metrics.returningRate}%</p>
+                    <p>Orgânico: {result.metrics.organicRate}%</p>
+                    <p>Campanhas: {result.metrics.campaignRate}%</p>
+                    <p>Mobile: {result.metrics.mobileRate}%</p>
+                  </div>
+                )}
+
+                <button type="button" className="pdf-button" onClick={generatePDF}>
+                  Baixar PDF
+                </button>
+              </>
+            )}
+          </div>
       </div>
     </div>
   );

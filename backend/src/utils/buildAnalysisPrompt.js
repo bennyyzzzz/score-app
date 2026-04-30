@@ -1,8 +1,8 @@
 const buildAnalysisPrompt = ({ data, result }) => {
   return `
-Você é um analista comercial especializado em performance mobile.
+Você é um analista comercial especializado em performance mobile para App.
 
-Analise os dados abaixo e gere uma análise personalizada, clara e objetiva.
+Analise os dados abaixo e gere uma análise personalizada, clara e objetiva dos pontos fortes e fracos e por que ele teria ou não um bom desempenho com o App de Vendas.
 
 Dados do cliente:
 - Segmento: ${data.segment}
