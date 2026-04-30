@@ -178,6 +178,12 @@ function App() {
               <h2 className="score">{result.score}</h2>
               <div className="stars">{"⭐".repeat(result.stars)}</div>
               <p className="insight">{result.insight}</p>
+              {result.ai?.analysis && (
+                <div className="ai-analysis">
+                  <h3>Análise personalizada</h3>
+                  <p>{result.ai.analysis}</p>
+                </div>
+              )}
 
               {result.metrics && (
                 <div className="metrics">

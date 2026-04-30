@@ -439,3 +439,16 @@ select:focus {
     grid-template-columns: 1fr;
   }
 }
+
+.ai-analysis {
+  margin-top: 18px;
+  text-align: left;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.ai-analysis h3 {
+  color: #fff;
+  margin-bottom: 8px;
+}
