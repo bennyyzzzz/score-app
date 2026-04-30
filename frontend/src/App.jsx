@@ -238,21 +238,18 @@ const generatePDF = () => {
                 {result.ai?.analysis ? (
                   <div className="ai-analysis">
                     <h3>Análise IA</h3>
+                  <div className={`ai-text ${showFullAI ? "expanded" : ""}`}>
+                    {result.ai.analysis}
+                  </div>
 
-                    <p>
-                      {showFullAI
-                        ? result.ai.analysis
-                        : getPreviewText(result.ai.analysis)}
-                    </p>
-
-                    {result.ai.analysis.length > 250 && (
-                      <button
-                        className="toggle-ai"
-                        onClick={() => setShowFullAI(!showFullAI)}
-                      >
-                        {showFullAI ? "Mostrar menos" : "Mostrar mais"}
-                      </button>
-                    )}
+                  {result.ai.analysis.length > 250 && (
+                    <button
+                      className="toggle-ai"
+                      onClick={() => setShowFullAI(!showFullAI)}
+                    >
+                      {showFullAI ? "Mostrar menos" : "Mostrar mais"}
+                    </button>
+                  )}
                   </div>
                 ) : result.ai?.error ? (
                   <div className="ai-unavailable">
