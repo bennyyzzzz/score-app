@@ -390,8 +390,8 @@ select:focus {
 
 .primary-button:hover,
 .pdf-button:hover {
-  background: #fff;
-  color: #000;
+  background: #1f1f1f;
+  color: #ffffff;
   transform: translateY(-2px);
 }
 
