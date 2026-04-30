@@ -452,3 +452,34 @@ select:focus {
   color: #fff;
   margin-bottom: 8px;
 }
+
+.ai-analysis,
+.ai-unavailable {
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.ai-analysis h3,
+.ai-unavailable h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  border: none;
+  padding: 0;
+}
+
+.ai-analysis p,
+.ai-unavailable p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.ai-unavailable small {
+  display: block;
+  margin-top: 8px;
+  color: #777;
+}

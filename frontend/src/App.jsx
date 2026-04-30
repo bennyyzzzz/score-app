@@ -178,6 +178,18 @@ function App() {
               <h2 className="score">{result.score}</h2>
               <div className="stars">{"⭐".repeat(result.stars)}</div>
               <p className="insight">{result.insight}</p>
+              {result.ai?.analysis ? (
+                <div className="ai-analysis">
+                  <h3>Análise IA</h3>
+                  <p>{result.ai.analysis}</p>
+                </div>
+              ) : result.ai?.error ? (
+                <div className="ai-unavailable">
+                  <h3>Análise IA indisponível</h3>
+                  <p>A análise personalizada por IA não está disponível no momento.</p>
+                  <small>{result.ai.provider ? `Provider: ${result.ai.provider}` : ""}</small>
+                </div>
+              ) : null}              
               {result.ai?.analysis && (
                 <div className="ai-analysis">
                   <h3>Análise personalizada</h3>

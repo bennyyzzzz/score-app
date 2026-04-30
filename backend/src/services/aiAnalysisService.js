@@ -1,9 +1,4 @@
-const OpenAI = require("openai");
 const buildAnalysisPrompt = require("../utils/buildAnalysisPrompt");
-
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 exports.generateAnalysis = async ({ data, result }) => {
   const prompt = buildAnalysisPrompt({ data, result });
@@ -11,34 +6,40 @@ exports.generateAnalysis = async ({ data, result }) => {
   if (process.env.AI_ENABLED !== "true") {
     return {
       enabled: false,
-      provider: "openai",
-      model: process.env.AI_MODEL || null,
+      provider: process.env.AI_PROVIDER || null,
       prompt,
       analysis: null,
     };
   }
 
-  if (!process.env.OPENAI_API_KEY) {
+  try {
+    let analysis;
+
+    if (process.env.AI_PROVIDER === "gemini") {
+      const geminiProvider = require("./providers/geminiProvider");
+      analysis = await geminiProvider.generate(prompt);
+    } else if (process.env.AI_PROVIDER === "openai") {
+      const openaiProvider = require("./providers/openaiProvider");
+      analysis = await openaiProvider.generate(prompt);
+    } else {
+      throw new Error("AI_PROVIDER inválido");
+    }
+
+    return {
+      enabled: true,
+      provider: process.env.AI_PROVIDER,
+      prompt,
+      analysis,
+    };
+  } catch (err) {
+    console.log("Erro IA:", err.message);
+
     return {
       enabled: false,
-      provider: "openai",
-      model: process.env.AI_MODEL || null,
+      provider: process.env.AI_PROVIDER,
       prompt,
       analysis: null,
-      error: "OPENAI_API_KEY não configurada",
+      error: err.message,
     };
   }
-
-  const response = await client.responses.create({
-    model: process.env.AI_MODEL || "gpt-5.5",
-    input: prompt,
-  });
-
-  return {
-    enabled: true,
-    provider: "openai",
-    model: process.env.AI_MODEL || "gpt-5.5",
-    prompt,
-    analysis: response.output_text,
-  };
 };
