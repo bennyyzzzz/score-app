@@ -23,13 +23,17 @@ const getSegmentScore = (segment) => {
     eletronicos: 75,
     beleza: 80,
     alimentos: 65,
+
+    moveis: 78,
+    decoracao: 82,
+    automotivo: 70,
+
     b2b: 55,
-    servicos: 60,
     outros: 60,
   };
 
   return scores[segment] || 60;
-};
+};;
 
 const generateInsight = (data, metrics, score) => {
   const points = [];
